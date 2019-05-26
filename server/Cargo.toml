@@ -1,0 +1,15 @@
+[package]
+name = "sortbytime"
+version = "0.1.0"
+authors = ["Roman Frołow <rofrol@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+actix-web = { version="1.0.0-rc ", features=["ssl"]}
+env_logger = "0.6.1"
+futures = "0.1.27"
+serde = "1.0.39"
+serde_json = "1.0.39"
+validator = "0.8.0"
+validator_derive = "0.8.0"
+serde_derive = "1.0.91"
