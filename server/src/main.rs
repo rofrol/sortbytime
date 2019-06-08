@@ -161,7 +161,14 @@ fn get_items(html: &str) -> Result<Vec<Item>, MyError> {
             let author_node = author_node_data_ref.as_node();
             println!("author_node: {:?}", author_node);
 
-            let author = author_node.text_contents().trim().to_string();
+            let author = author_node
+                .text_contents()
+                .trim()
+                // TODO: Get only text node
+                // https://stackoverflow.com/questions/56329121/how-to-get-only-text-node-with-kuchiki
+                // https://users.rust-lang.org/t/how-to-get-only-text-node-with-kuchiki/29084
+                .trim_start_matches("@")
+                .to_string();
 
             println!("author: {:?}", author);
 
@@ -233,7 +240,7 @@ mod tests {
                 date_published: DateTime::parse_from_rfc3339("2019-05-26T12:26:01+02:00").unwrap().with_timezone(&Local),
                 source: "https://m.youtube.com/watch?v=74eMjNg_dmE&feature=youtu.be".to_string(),
                 description: "Czy bieganie jest ważniejsze od ratowania życia?".to_string(),
-                author: "@Bananowy96".to_string(),
+                author: "Bananowy96".to_string(),
                 author_url: "https://www.wykop.pl/ludzie/Bananowy96/".to_string(),
             }
         ];
