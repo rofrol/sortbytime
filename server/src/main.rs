@@ -90,7 +90,7 @@ fn get_items(html: &str) -> Result<Vec<Item>, MyError> {
         .map_err(|()| MyError::MissingItems)?
         .take(1)
         .map(|item| {
-            println!("{:?}", item);
+            dbg!(&item);
 
             println!("{:?}", item.text_contents());
 
