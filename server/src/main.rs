@@ -37,9 +37,9 @@ use chrono::{DateTime, Local};
 
 #[derive(Debug, Validate, Deserialize, Serialize)]
 struct SomeData {
-    #[validate(length(min = "1", max = "1000000"))]
+    #[validate(length(min = 1, max = 1000000))]
     id: String,
-    #[validate(length(min = "1", max = "100"))]
+    #[validate(length(min = 1, max = 100))]
     name: String,
 }
 
