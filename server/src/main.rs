@@ -167,7 +167,7 @@ fn get_items(html: &str) -> Result<Vec<Item>, MyError> {
                 // TODO: Get only text node
                 // https://stackoverflow.com/questions/56329121/how-to-get-only-text-node-with-kuchiki
                 // https://users.rust-lang.org/t/how-to-get-only-text-node-with-kuchiki/29084
-                .trim_start_matches("@")
+                .trim_start_matches('@')
                 .to_string();
 
             println!("author: {:?}", author);
@@ -194,14 +194,14 @@ fn get_items(html: &str) -> Result<Vec<Item>, MyError> {
             println!("author_nodes: {:?}", author_nodes);
 
             Item {
-                count: count,
-                title: title,
-                href: href,
-                date_published: date_published,
-                source: source,
-                description: description,
-                author: author,
-                author_url: author_url,
+                count,
+                title,
+                href,
+                date_published,
+                source,
+                description,
+                author,
+                author_url,
             }
         })
         .collect())
