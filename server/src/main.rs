@@ -227,7 +227,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn get_items_test() -> Result<(), Box<std::error::Error>> {
+    fn get_items_test() -> Result<(), Box<dyn std::error::Error>> {
         use std::fs;
         let html = fs::read_to_string("out.html").expect("Unable to read file");
         let actual = get_items(&html).unwrap();
