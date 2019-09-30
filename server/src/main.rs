@@ -12,11 +12,7 @@
 //           - POSTing json body
 //     3. chaining futures into a single response used by an asynch endpoint
 
-#[macro_use]
-extern crate validator_derive;
-
-#[macro_use]
-extern crate serde_derive;
+use serde::{Serialize, Deserialize};
 
 use std::io;
 
@@ -24,15 +20,15 @@ use actix_web::client::Client;
 use actix_web::{web, App, Error as ActixError, HttpResponse, HttpServer};
 use futures::Future;
 use validator::Validate;
+use validator_derive::Validate;
 
-extern crate kuchiki;
+
 use kuchiki::traits::*;
 use kuchiki::NodeRef;
 //use kuchiki::tree::{ElementData, Html, NodeDataRef, NodeRef};
 
 use derive_more::Display;
 
-extern crate chrono;
 use chrono::{DateTime, Local};
 
 #[derive(Debug, Validate, Deserialize, Serialize)]
@@ -210,7 +206,7 @@ fn get_items(html: &str) -> Result<Vec<Item>, MyError> {
 fn main() -> io::Result<()> {
     std::env::set_var("RUST_LOG", "actix_web=info");
     env_logger::init();
-    let endpoint = "127.0.0.1:8080";
+    let endpoint = "127.0.0.1:8088";
 
     println!("Starting server at: {:?}", endpoint);
     HttpServer::new(|| {
