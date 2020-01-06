@@ -36,3 +36,7 @@ To show println!
 $ cargo test -- --nocapture
 $ cargo test get_items_test -- --nocapture
 ```
+
+with cargo watch:
+
+`cargo watch -x 'test get_items_test'`

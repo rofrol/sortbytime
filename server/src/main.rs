@@ -175,17 +175,28 @@ fn get_items(html: &str) -> Result<Vec<Item>, MyError> {
             println!("description: {:?}", description);
 
             let author_node_data_ref = item_node.select_first("a[href*='ludzie'").unwrap();
+
             let author_node = author_node_data_ref.as_node();
             println!("author_node: {:?}", author_node);
 
-            let author = author_node
-                .text_contents()
-                .trim()
-                // TODO: Get only text node
-                // https://stackoverflow.com/questions/56329121/how-to-get-only-text-node-with-kuchiki
-                // https://users.rust-lang.org/t/how-to-get-only-text-node-with-kuchiki/29084
-                .trim_start_matches('@')
-                .to_string();
+            //let author = author_node
+            //    .text_contents()
+            //    .trim()
+            //    // TODO: Get only text node
+            //    // https://stackoverflow.com/questions/56329121/how-to-get-only-text-node-with-kuchiki
+            //    // https://users.rust-lang.org/t/how-to-get-only-text-node-with-kuchiki/29084
+            //    .trim_start_matches('@')
+            //    .to_string();
+
+            let author = match author_node_data_ref
+                .as_node()
+                .children()
+                .text_nodes()
+                .last()
+            {
+                Some(x) => x.borrow().clone().to_string().trim().to_string(),
+                None => String::from(""),
+            };
 
             println!("author: {:?}", author);
 
