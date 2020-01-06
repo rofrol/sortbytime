@@ -57,11 +57,16 @@ async fn hity(
         body.extend_from_slice(&chunk?);
     }
 
-    let body: SomeData = serde_json::from_slice(&body).unwrap();
+    let body_string = String::from_utf8(body.to_vec()).unwrap();
+    let items = get_items(&body_string);
+    println!("items: {:?}", items);
 
-    Ok(HttpResponse::Ok()
-        .content_type("application/json")
-        .body(serde_json::to_string(&body).unwrap()))
+    Ok(HttpResponse::Ok().body("Hello"))
+    //let body: SomeData = serde_json::from_slice(&body).unwrap();
+
+    //Ok(HttpResponse::Ok()
+    //    .content_type("application/json")
+    //    .body(serde_json::to_string(&body).unwrap()))
 
     //.and_then(|mut resp| {
     //    resp.body().from_err().and_then(|body| {
@@ -104,7 +109,7 @@ fn get_items(html: &str) -> Result<Vec<Item>, MyError> {
         .map(|item| {
             dbg!(&item);
 
-            println!("{:?}", item.text_contents());
+            dbg!("{:?}", item.text_contents());
 
             let item_node: &kuchiki::NodeRef = item.as_node();
 
