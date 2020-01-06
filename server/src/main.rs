@@ -1,17 +1,4 @@
-// This is a contrived example intended to illustrate actix-web features.
-// *Imagine* that you have a process that involves 3 steps.  The steps here
-// are dumb in that they do nothing other than call an
-// httpbin endpoint that returns the json that was posted to it.  The intent
-// here is to illustrate how to chain these steps together as futures and return
-// a final result in a response.
-//
-// Actix-web features illustrated here include:
-//     1. handling json input param
-//     2. validating user-submitted parameters using the 'validator' crate
-//     2. actix-web client features:
-//           - POSTing json body
-//     3. chaining futures into a single response used by an asynch endpoint
-
+// Based on https://github.com/actix/examples/blob/e8ab9ee7cab3a17aedbddb4800d56d206d0a296f/async_ex1/src/main.rs
 use serde::{Deserialize, Serialize};
 
 use std::io;
@@ -27,7 +14,7 @@ use validator::Validate;
 use validator_derive::Validate;
 
 use kuchiki::traits::*;
-use kuchiki::NodeRef;
+//use kuchiki::NodeRef;
 //use kuchiki::tree::{ElementData, Html, NodeDataRef, NodeRef};
 
 use derive_more::Display;
@@ -211,15 +198,15 @@ fn get_items(html: &str) -> Result<Vec<Item>, MyError> {
 
             println!("author_url: {:?}", author_url);
 
-            let author_nodes: Vec<NodeRef> = author_node
-                .descendants()
-                .filter(|node| {
-                    println!("node: {:?}", node);
-                    true
-                })
-                .collect();
+            //let author_nodes: Vec<NodeRef> = author_node
+            //    .descendants()
+            //    .filter(|node| {
+            //        println!("node: {:?}", node);
+            //        true
+            //    })
+            //    .collect();
 
-            println!("author_nodes: {:?}", author_nodes);
+            //println!("author_nodes: {:?}", author_nodes);
 
             Item {
                 count,
