@@ -12,16 +12,19 @@
 //           - POSTing json body
 //     3. chaining futures into a single response used by an asynch endpoint
 
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 use std::io;
 
-use actix_web::client::Client;
-use actix_web::{web, App, Error as ActixError, HttpResponse, HttpServer};
-use futures::Future;
+use actix_web::{
+    client::Client,
+    web::{self, BytesMut},
+    App, Error as ActixError, HttpResponse, HttpServer,
+};
+
+use futures::StreamExt;
 use validator::Validate;
 use validator_derive::Validate;
-
 
 use kuchiki::traits::*;
 use kuchiki::NodeRef;
@@ -39,23 +42,36 @@ struct SomeData {
     name: String,
 }
 
-fn hity(
+async fn hity(
     _some_data: web::Json<SomeData>,
     client: web::Data<Client>,
-) -> impl Future<Item = HttpResponse, Error = ActixError> {
-    client
+) -> Result<HttpResponse, ActixError> {
+    let mut res = client
         .get("https://www.wykop.pl/hity/dnia/")
         .send()
-        .map_err(ActixError::from)
-        .and_then(|mut resp| {
-            resp.body().from_err().and_then(|body| {
-                let body_string = String::from_utf8(body.to_vec()).unwrap();
-                let items = get_items(&body_string);
-                println!("items: {:?}", items);
+        .await
+        .map_err(ActixError::from)?;
 
-                Ok(HttpResponse::Ok().body("Hello"))
-            })
-        })
+    let mut body = BytesMut::new();
+    while let Some(chunk) = res.next().await {
+        body.extend_from_slice(&chunk?);
+    }
+
+    let body: SomeData = serde_json::from_slice(&body).unwrap();
+
+    Ok(HttpResponse::Ok()
+        .content_type("application/json")
+        .body(serde_json::to_string(&body).unwrap()))
+
+    //.and_then(|mut resp| {
+    //    resp.body().from_err().and_then(|body| {
+    //        let body_string = String::from_utf8(body.to_vec()).unwrap();
+    //        let items = get_items(&body_string);
+    //        println!("items: {:?}", items);
+
+    //        Ok(HttpResponse::Ok().body("Hello"))
+    //    })
+    //})
 }
 
 #[derive(Debug, PartialEq)]
@@ -203,7 +219,8 @@ fn get_items(html: &str) -> Result<Vec<Item>, MyError> {
         .collect())
 }
 
-fn main() -> io::Result<()> {
+#[actix_rt::main]
+async fn main() -> io::Result<()> {
     std::env::set_var("RUST_LOG", "actix_web=info");
     env_logger::init();
     let endpoint = "127.0.0.1:8088";
@@ -212,10 +229,11 @@ fn main() -> io::Result<()> {
     HttpServer::new(|| {
         App::new()
             .data(Client::default())
-            .service(web::resource("/hity").route(web::post().to_async(hity)))
+            .service(web::resource("/hity").route(web::post().to(hity)))
     })
     .bind(endpoint)?
     .run()
+    .await
 }
 
 #[cfg(test)]
