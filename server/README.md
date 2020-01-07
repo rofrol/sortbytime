@@ -16,6 +16,8 @@ description: `htmlq -p '#itemsStream > li:first-of-type .description' --text < o
 
 `curl -H "Content-Type: application/json" "http://localhost:8088/hity" -d '{"id":"1", "name": "JohnDoe"}'`
 
+`curl -s -H "Content-Type: application/json" "http://localhost:8088/hity" -d '{"id":"1", "name": "JohnDoe"}' | jq '.'`
+
 ## Run tests
 
 Run all tests except ignored:

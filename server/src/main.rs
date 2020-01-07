@@ -5,6 +5,7 @@ use std::io;
 
 use actix_web::{
     client::Client,
+    error,
     web::{self, BytesMut},
     App, Error as ActixError, HttpResponse, HttpServer,
 };
@@ -29,6 +30,14 @@ struct SomeData {
     name: String,
 }
 
+// https://github.com/masnagam/mirakc/blob/4e7bae797439a9b786968c2766155ff214503a49/src/web.rs#L45
+#[derive(Serialize)]
+struct ErrorBody {
+    pub code: u16,
+    pub reason: Option<&'static str>,
+    pub errors: Vec<u8>,
+}
+
 async fn hity(
     _some_data: web::Json<SomeData>,
     client: web::Data<Client>,
@@ -45,28 +54,31 @@ async fn hity(
     }
 
     let body_string = String::from_utf8(body.to_vec()).unwrap();
-    let items = get_items(&body_string);
-    println!("items: {:?}", items);
-
-    Ok(HttpResponse::Ok().body("Hello"))
-    //let body: SomeData = serde_json::from_slice(&body).unwrap();
-
-    //Ok(HttpResponse::Ok()
-    //    .content_type("application/json")
-    //    .body(serde_json::to_string(&body).unwrap()))
-
-    //.and_then(|mut resp| {
-    //    resp.body().from_err().and_then(|body| {
-    //        let body_string = String::from_utf8(body.to_vec()).unwrap();
-    //        let items = get_items(&body_string);
-    //        println!("items: {:?}", items);
-
-    //        Ok(HttpResponse::Ok().body("Hello"))
-    //    })
-    //})
+    let result = get_items(&body_string);
+    match result {
+        Ok(items) => {
+            if items.len() == 0 {
+                // https://github.com/KilianKrause/rest-api-with-actix/blob/067970b4757b34a9031b49d730e91e5f60a4412b/src/request_handler.rs#L18
+                Err(error::ErrorNotFound(serde_json::json!(ErrorBody {
+                    code: actix_web::http::StatusCode::NOT_FOUND.as_u16(),
+                    reason: None,
+                    errors: Vec::new(),
+                })))
+            } else {
+                Ok(HttpResponse::Ok()
+                    .content_type("application/json")
+                    .body(serde_json::to_string(&items).expect("serde_json::to_string failed")))
+            }
+        }
+        Err(err) => {
+            println!("{:?}", err);
+            let msg = format!("Something wrong with get_items: {}", err);
+            Err(error::ErrorBadRequest(msg))
+        }
+    }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Serialize)]
 struct Item {
     count: u32,
     title: String,
