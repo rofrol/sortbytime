@@ -38,10 +38,7 @@ struct ErrorBody {
     pub errors: Vec<u8>,
 }
 
-async fn hity(
-    _some_data: web::Json<SomeData>,
-    client: web::Data<Client>,
-) -> Result<HttpResponse, ActixError> {
+async fn hity(client: web::Data<Client>) -> Result<HttpResponse, ActixError> {
     let mut res = client
         .get("https://www.wykop.pl/hity/dnia/")
         .send()
@@ -244,7 +241,7 @@ async fn main() -> io::Result<()> {
     HttpServer::new(|| {
         App::new()
             .data(Client::default())
-            .service(web::resource("/hity").route(web::post().to(hity)))
+            .service(web::resource("/hity").route(web::get().to(hity)))
     })
     .bind(endpoint)?
     .run()

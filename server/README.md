@@ -14,9 +14,9 @@ description: `htmlq -p '#itemsStream > li:first-of-type .description' --text < o
 
 ## test request
 
-`curl -H "Content-Type: application/json" "http://localhost:8088/hity" -d '{"id":"1", "name": "JohnDoe"}'`
+`curl "http://localhost:8088/hity"`
 
-`curl -s -H "Content-Type: application/json" "http://localhost:8088/hity" -d '{"id":"1", "name": "JohnDoe"}' | jq '.'`
+`curl -s "http://localhost:8088/hity" | jq '.'`
 
 ## Run tests
 
