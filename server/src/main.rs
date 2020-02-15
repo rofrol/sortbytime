@@ -190,7 +190,7 @@ fn get_items(html: &str) -> Result<Vec<Item>, MyError> {
                 .text_nodes()
                 .last()
             {
-                Some(x) => x.borrow().clone().to_string().trim().to_string(),
+                Some(x) => x.borrow().clone().trim().to_string(),
                 None => String::from(""),
             };
 
