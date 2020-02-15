@@ -54,7 +54,7 @@ async fn hity(client: web::Data<Client>) -> Result<HttpResponse, ActixError> {
     let result = get_items(&body_string);
     match result {
         Ok(items) => {
-            if items.len() == 0 {
+            if items.is_empty() {
                 // https://github.com/KilianKrause/rest-api-with-actix/blob/067970b4757b34a9031b49d730e91e5f60a4412b/src/request_handler.rs#L18
                 Err(error::ErrorNotFound(serde_json::json!(ErrorBody {
                     code: actix_web::http::StatusCode::NOT_FOUND.as_u16(),
