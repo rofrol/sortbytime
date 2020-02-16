@@ -22,6 +22,9 @@ use derive_more::Display;
 
 use chrono::{DateTime, Local};
 
+use std::fs;
+use std::path::Path;
+
 #[derive(Debug, Validate, Deserialize, Serialize)]
 struct SomeData {
     #[validate(length(min = 1, max = 1000000))]
@@ -51,6 +54,15 @@ async fn hity(client: web::Data<Client>) -> Result<HttpResponse, ActixError> {
     }
 
     let body_string = String::from_utf8(body.to_vec()).unwrap();
+
+    let date = Local::now();
+    println!("{}", date.format("%Y%m%dT%H%M%S"));
+    fs::create_dir_all("output")?;
+    fs::write(
+        Path::new("output").join(date.format("%Y%m%dT%H%M%S.html").to_string()),
+        &body_string,
+    )?;
+
     let result = get_items(&body_string);
     match result {
         Ok(items) => {
@@ -109,31 +121,31 @@ fn get_items(html: &str) -> Result<Vec<Item>, MyError> {
         //.take(1)
         .take(40)
         .map(|item| {
-            dbg!(&item);
+            //dbg!(&item);
 
-            dbg!("{:?}", item.text_contents());
+            //dbg!("{:?}", item.text_contents());
 
             let item_node: &kuchiki::NodeRef = item.as_node();
 
             let count_node_data_ref = item_node
                 .select_first(".diggbox span:first-of-type")
                 .unwrap();
-            println!("count_node_data_ref: {:?}", count_node_data_ref);
-            println!(
-                "count_node_data_ref.text_contents(): {:?}",
-                count_node_data_ref.text_contents()
-            );
+            //println!("count_node_data_ref: {:?}", count_node_data_ref);
+            //println!(
+            //    "count_node_data_ref.text_contents(): {:?}",
+            //    count_node_data_ref.text_contents()
+            //);
             let count: u32 = count_node_data_ref.text_contents().parse().unwrap();
 
             let a_node_data_ref = item_node.select_first("h2 a").unwrap();
             let a_node = a_node_data_ref.as_node();
 
             let title: String = a_node_data_ref.text_contents();
-            println!("title: {}", title);
+            //println!("title: {}", title);
 
             let a_elt = a_node.as_element().unwrap();
             let href = a_elt.attributes.borrow().get("href").unwrap().to_string();
-            println!("href: {:?}", href);
+            //println!("href: {:?}", href);
 
             let date_published_string = item_node
                 .select_first("[itemprop='datePublished']")
@@ -150,7 +162,7 @@ fn get_items(html: &str) -> Result<Vec<Item>, MyError> {
             let date_published = DateTime::parse_from_rfc3339(&date_published_string)
                 .unwrap()
                 .with_timezone(&Local);
-            println!("date_published: {:?}", date_published);
+            //println!("date_published: {:?}", date_published);
 
             let source = item_node
                 .select_first("[title~='źródło']")
@@ -164,7 +176,7 @@ fn get_items(html: &str) -> Result<Vec<Item>, MyError> {
                 .unwrap()
                 .to_string();
 
-            println!("source: {:?}", source);
+            //println!("source: {:?}", source);
 
             let description = item_node
                 .select_first(".description a")
@@ -174,12 +186,12 @@ fn get_items(html: &str) -> Result<Vec<Item>, MyError> {
                 .trim()
                 .to_string();
 
-            println!("description: {:?}", description);
+            //println!("description: {:?}", description);
 
             let author_node_data_ref = item_node.select_first("a[href*='ludzie'").unwrap();
 
             let author_node = author_node_data_ref.as_node();
-            println!("author_node: {:?}", author_node);
+            //println!("author_node: {:?}", author_node);
 
             //let author = author_node
             //    .text_contents()
@@ -200,7 +212,7 @@ fn get_items(html: &str) -> Result<Vec<Item>, MyError> {
                 None => String::from(""),
             };
 
-            println!("author: {:?}", author);
+            //println!("author: {:?}", author);
 
             let author_url = author_node
                 .as_element()
@@ -211,7 +223,7 @@ fn get_items(html: &str) -> Result<Vec<Item>, MyError> {
                 .unwrap()
                 .to_string();
 
-            println!("author_url: {:?}", author_url);
+            //println!("author_url: {:?}", author_url);
 
             //let author_nodes: Vec<NodeRef> = author_node
             //    .descendants()
