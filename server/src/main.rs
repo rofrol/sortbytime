@@ -56,10 +56,11 @@ async fn hity(client: web::Data<Client>) -> Result<HttpResponse, ActixError> {
     let body_string = String::from_utf8(body.to_vec()).unwrap();
 
     let date = Local::now();
-    println!("{}", date.format("%Y%m%dT%H%M%S"));
+    let dt = date.format("%Y%m%dT%H%M%S%z");
+    println!("{}", dt);
     fs::create_dir_all("output")?;
     fs::write(
-        Path::new("output").join(date.format("%Y%m%dT%H%M%S%z.html").to_string()),
+        Path::new("output").join(format!("{}.html", dt)),
         &body_string,
     )?;
 
