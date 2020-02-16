@@ -55,13 +55,15 @@ async fn hity(client: web::Data<Client>) -> Result<HttpResponse, ActixError> {
 
     let body_string = String::from_utf8(body.to_vec()).unwrap();
 
+    let body_string2 = fs::read_to_string("output/20200217T001145+0100.html")?;
+
     let date = Local::now();
     let dt = date.format("%Y%m%dT%H%M%S%z");
     println!("{}", dt);
     fs::create_dir_all("output")?;
     fs::write(
         Path::new("output").join(format!("{}.html", dt)),
-        &body_string,
+        &body_string2,
     )?;
 
     let result = get_items(&body_string);
@@ -120,7 +122,7 @@ fn get_items(html: &str) -> Result<Vec<Item>, MyError> {
     Ok(lis
         .iter()
         //.take(1)
-        .take(40)
+        //.take(40)
         .map(|item| {
             //dbg!(&item);
 
@@ -142,7 +144,7 @@ fn get_items(html: &str) -> Result<Vec<Item>, MyError> {
             let a_node = a_node_data_ref.as_node();
 
             let title: String = a_node_data_ref.text_contents();
-            //println!("title: {}", title);
+            println!("title: {}", title);
 
             let a_elt = a_node.as_element().unwrap();
             let href = a_elt.attributes.borrow().get("href").unwrap().to_string();
@@ -176,7 +178,6 @@ fn get_items(html: &str) -> Result<Vec<Item>, MyError> {
                 .get("href")
                 .unwrap()
                 .to_string();
-
             //println!("source: {:?}", source);
 
             let description = item_node
@@ -189,7 +190,7 @@ fn get_items(html: &str) -> Result<Vec<Item>, MyError> {
 
             //println!("description: {:?}", description);
 
-            let author_node_data_ref = item_node.select_first("a[href*='ludzie'").unwrap();
+            let author_node_data_ref = item_node.select_first(".affect").unwrap();
 
             let author_node = author_node_data_ref.as_node();
             //println!("author_node: {:?}", author_node);
@@ -202,6 +203,17 @@ fn get_items(html: &str) -> Result<Vec<Item>, MyError> {
             //    // https://users.rust-lang.org/t/how-to-get-only-text-node-with-kuchiki/29084
             //    .trim_start_matches('@')
             //    .to_string();
+
+            /*
+            <div class="fix-tagline">
+              <a class="color-1 affect" href="https://www.wykop.pl/ludzie/WroTaMar/"><em>@</em>WroTaMar</a>
+
+            or
+
+            <div class="fix-tagline">
+              <span class="color-1002 affect"><em>@</em>tazos</span>
+
+            */
 
             let author = match author_node_data_ref
                 .as_node()
