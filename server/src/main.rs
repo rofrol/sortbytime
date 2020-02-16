@@ -16,7 +16,7 @@ use validator_derive::Validate;
 
 use kuchiki::traits::*;
 //use kuchiki::NodeRef;
-//use kuchiki::tree::{ElementData, Html, NodeDataRef, NodeRef};
+use kuchiki::{ElementData, NodeDataRef};
 
 use derive_more::Display;
 
@@ -75,7 +75,7 @@ async fn hity(client: web::Data<Client>) -> Result<HttpResponse, ActixError> {
     }
 }
 
-#[derive(Debug, PartialEq, Serialize)]
+#[derive(Debug, PartialEq, Serialize, Clone)]
 struct Item {
     count: u32,
     title: String,
@@ -98,10 +98,16 @@ fn get_items(html: &str) -> Result<Vec<Item>, MyError> {
 
     // println!("{:?}", html);
     let document = kuchiki::parse_html().one(html);
-    Ok(document
+    let lis = document
         .select(css_selector)
         .map_err(|()| MyError::MissingItems)?
-        .take(1)
+        .collect::<Vec<NodeDataRef<ElementData>>>();
+    println!(">>>>>>>>{}", lis.len());
+    //Ok(vec![])
+    Ok(lis
+        .iter()
+        //.take(1)
+        .take(40)
         .map(|item| {
             dbg!(&item);
 
@@ -256,7 +262,8 @@ mod tests {
     fn get_items_test() -> Result<(), Box<dyn std::error::Error>> {
         use std::fs;
         let html = fs::read_to_string("out.html").expect("Unable to read file");
-        let actual = get_items(&html).unwrap();
+        let items = get_items(&html).unwrap();
+        let actual = vec![items[0].clone()];
 
         let expected: Vec<Item> = vec![
             Item {
@@ -272,6 +279,9 @@ mod tests {
         ];
 
         assert_eq!(actual, expected);
+
+        println!(">>>>>>>>{}", items.len());
+        println!(">>>>>>>>{:?}", items[1]);
 
         Ok(())
     }
