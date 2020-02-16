@@ -42,3 +42,7 @@ $ cargo test get_items_test -- --nocapture
 with cargo watch:
 
 `cargo watch -x 'test get_items_test'`
+
+only one test and without capturing output
+
+`cargo watch -x 'test tests::get_items_test -- --nocapture'`
