@@ -55,7 +55,7 @@ async fn hity(client: web::Data<Client>) -> Result<HttpResponse, ActixError> {
 
     let body_string = String::from_utf8(body.to_vec()).unwrap();
 
-    let body_string2 = fs::read_to_string("output/20200217T001145+0100.html")?;
+    //let body_string = fs::read_to_string("output/20200217T001145+0100.html")?;
 
     let date = Local::now();
     let dt = date.format("%Y%m%dT%H%M%S%z");
@@ -63,7 +63,7 @@ async fn hity(client: web::Data<Client>) -> Result<HttpResponse, ActixError> {
     fs::create_dir_all("output")?;
     fs::write(
         Path::new("output").join(format!("{}.html", dt)),
-        &body_string2,
+        &body_string,
     )?;
 
     let result = get_items(&body_string);
@@ -99,7 +99,7 @@ struct Item {
     source: String,
     description: String,
     author: String,
-    author_url: String,
+    author_url: Option<String>,
 }
 
 #[derive(Debug, Display)]
@@ -221,14 +221,16 @@ fn get_items(html: &str) -> Result<Vec<Item>, MyError> {
 
             //println!("author: {:?}", author);
 
-            let author_url = author_node
+            let author_url = match author_node
                 .as_element()
                 .unwrap()
                 .attributes
                 .borrow()
                 .get("href")
-                .unwrap()
-                .to_string();
+            {
+                Some(url) => Some(url.to_string()),
+                None => None,
+            };
 
             //println!("author_url: {:?}", author_url);
 
@@ -293,7 +295,7 @@ mod tests {
                 source: "https://m.youtube.com/watch?v=74eMjNg_dmE&feature=youtu.be".to_string(),
                 description: "Czy bieganie jest ważniejsze od ratowania życia?".to_string(),
                 author: "Bananowy96".to_string(),
-                author_url: "https://www.wykop.pl/ludzie/Bananowy96/".to_string(),
+                author_url: Some("https://www.wykop.pl/ludzie/Bananowy96/".to_string()),
             }
         ];
 
