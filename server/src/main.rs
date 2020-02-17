@@ -191,7 +191,6 @@ fn get_items(html: &str) -> Result<Vec<Item>, MyError> {
             //println!("description: {:?}", description);
 
             let author_node_data_ref = item_node.select_first(".affect").unwrap();
-
             let author_node = author_node_data_ref.as_node();
             //println!("author_node: {:?}", author_node);
 
@@ -215,12 +214,7 @@ fn get_items(html: &str) -> Result<Vec<Item>, MyError> {
 
             */
 
-            let author = match author_node_data_ref
-                .as_node()
-                .children()
-                .text_nodes()
-                .last()
-            {
+            let author = match author_node.children().text_nodes().last() {
                 Some(x) => x.borrow().clone().trim().to_string(),
                 None => String::from(""),
             };
