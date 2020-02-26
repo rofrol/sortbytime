@@ -282,7 +282,8 @@ mod tests {
     #[test]
     fn get_items_test() -> Result<(), Box<dyn std::error::Error>> {
         use std::fs;
-        let html = fs::read_to_string("out.html").expect("Unable to read file");
+        let html =
+            fs::read_to_string("output/20190810T120541+0200.html").expect("Unable to read file");
         let items = get_items(&html).unwrap();
         let actual = vec![items[0].clone()];
 
